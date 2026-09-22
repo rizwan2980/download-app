@@ -1,0 +1,42 @@
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Local Portable Runtimes & Binaries (Windows specific)
+python_runtime/
+bin/
+installer/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+
+# Downloads & User Media (preserve folder structure with .gitkeep)
+downloads/*
+!downloads/.gitkeep
+
+# Persistent local settings & logs
+settings.json
+*.log
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Configs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+models/
+*.onnx

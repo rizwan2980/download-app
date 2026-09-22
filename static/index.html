@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniDownloader | All-in-One Social Media & Watermark Remover</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=15.0">
+</head>
+<body class="dark-theme">
+    <div class="app-background">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header glass-card">
+            <div class="logo-group">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>OmniDownloader <span class="badge-pro">PRO</span></h1>
+                    <p class="subtitle">Universal Social Media Downloader & Watermark Remover</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="downloader" id="tab-btn-downloader">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <span>Downloader</span>
+                </button>
+                <!-- <button class="nav-tab" data-tab="promptgen" id="tab-btn-promptgen" style="display: none;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>AI Video to Prompt</span>
+                </button> -->
+                <button class="nav-tab" data-tab="watermark" id="tab-btn-watermark">
+                    <i class="fa-solid fa-scissors"></i>
+                    <span>Watermark Studio</span>
+                </button>
+                <button class="nav-tab" data-tab="batch" id="tab-btn-batch">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Batch Download</span>
+                </button>
+                <button class="nav-tab" data-tab="library" id="tab-btn-library">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Library</span>
+                    <span class="library-count-badge" id="library-count">0</span>
+                </button>
+                <button class="nav-tab" data-tab="settings" id="tab-btn-settings">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <div class="header-status">
+                <div class="status-chip active">
+                    <span class="status-dot"></span>
+                    <span class="status-label">FFmpeg Ready</span>
+                </div>
+                <button class="btn-icon" id="header-open-folder-btn" title="Open Downloads Folder">
+                    <i class="fa-solid fa-folder-tree"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- TAB 1: Universal Downloader -->
+            <section class="tab-panel active" id="panel-downloader">
+                <div class="panel-hero">
+                    <h2 class="hero-title">Paste Video URL to Download</h2>
+                    <p class="hero-desc">Supports TikTok (No Watermark), Instagram Reels, YouTube 4K/MP3, Facebook HD, X/Twitter, Pinterest & 1000+ sites</p>
+                    
+                    <!-- Supported platform pills -->
+                    <div class="platform-pills">
+                        <span class="pill"><i class="fa-brands fa-tiktok"></i> TikTok (No WM)</span>
+                        <span class="pill"><i class="fa-brands fa-instagram"></i> Instagram</span>
+                        <span class="pill"><i class="fa-brands fa-youtube"></i> YouTube 4K/MP3</span>
+                        <span class="pill"><i class="fa-brands fa-facebook"></i> Facebook HD</span>
+                        <span class="pill"><i class="fa-brands fa-x-twitter"></i> X / Twitter</span>
+                        <span class="pill"><i class="fa-brands fa-pinterest"></i> Pinterest</span>
+                        <span class="pill"><i class="fa-brands fa-reddit-alien"></i> Reddit</span>
+                    </div>
+                </div>
+
+                <!-- URL Input Bar -->
+                <div class="url-input-container glass-card">
+                    <div class="url-icon-wrapper" id="platform-detect-icon">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <input type="text" id="video-url-input" class="url-input" placeholder="Paste link here (e.g., https://www.tiktok.com/@user/video/... or YouTube, Instagram)" autocomplete="off">
+                    <div class="input-actions">
+                        <button class="btn-secondary" id="btn-paste">
+                            <i class="fa-solid fa-paste"></i>
+                            <span>Paste</span>
+                        </button>
+                        <button class="btn-primary" id="btn-fetch-info">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Fetch Video</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="fetch-loading-state glass-card" id="fetch-loader" style="display: none;">
+                    <div class="spinner"></div>
+                    <div class="loading-text">
+                        <h4>Analyzing Link & Extracting Streams...</h4>
+                        <p>Resolving clean source and available resolutions</p>
+                    </div>
+                </div>
+
+                <!-- Video Preview & Download Configuration Card -->
+                <div class="video-preview-card glass-card" id="video-preview-card" style="display: none;">
+                    <div class="preview-layout">
+                        <!-- Thumbnail Column -->
+                        <div class="preview-media-col">
+                            <div class="thumbnail-wrapper">
+                                <img id="preview-thumbnail" src="" alt="Video thumbnail">
+                                <span class="duration-badge" id="preview-duration">00:00</span>
+                                <div class="platform-tag" id="preview-platform-tag">
+                                    <i class="fa-brands fa-tiktok"></i>
+                                    <span>TikTok</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Details & Options Column -->
+                        <div class="preview-info-col">
+                            <div class="video-header-info">
+                                <h3 class="video-title" id="preview-title">Video Title</h3>
+                                <div class="video-meta">
+                                    <span class="author-tag"><i class="fa-solid fa-circle-user"></i> <span id="preview-author">Author</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Watermark Removal Toggle Feature -->
+                            <div class="watermark-toggle-box" id="watermark-feature-box">
+                                <div class="toggle-info">
+                                    <div class="toggle-icon">
+                                        <i class="fa-solid fa-sparkles"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="toggle-title">Clean Stream (No Watermark)</h4>
+                                        <p class="toggle-desc">Automatically fetch untouched HD video without any platform watermark</p>
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="toggle-source-nowm" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <!-- Format Selector -->
+                            <div class="format-selection-section">
+                                <label class="section-label"><i class="fa-solid fa-sliders"></i> Select Download Quality:</label>
+                                <div class="format-chips-grid" id="format-chips-container">
+                                    <!-- Dynamic format chips will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- CTA Actions -->
+                            <div class="preview-cta-actions">
+                                <button class="btn-download-action" id="btn-start-download">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Download Video Now</span>
+                                </button>
+                                <button class="btn-secondary" id="btn-open-studio-direct">
+                                    <i class="fa-solid fa-scissors"></i>
+                                    <span>Open in Watermark Studio</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Downloads Manager Section -->
+                <div class="active-downloads-section">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-arrow-down-up-across-line"></i> Download Queue & Progress</h3>
+                        <button class="btn-text" id="btn-clear-completed-jobs">Clear Completed</button>
+                    </div>
+                    <div class="jobs-list" id="jobs-list-container">
+                        <div class="empty-jobs-state" id="empty-jobs-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+                            <p>No active downloads in queue. Paste a link above to start!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: AI Video-to-Prompt Generator -->
+            <section class="tab-panel" id="panel-promptgen">
+                <div class="panel-hero">
+                    <h2 class="hero-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan); margin-right:8px;"></i> AI Video-to-Prompt Generator</h2>
+                    <p class="hero-desc">Upload any video to generate a detailed, A-to-Z cinematic AI video generation prompt structured for your target duration (10s, 15s, 30s)</p>
+                </div>
+
+                <div class="promptgen-workspace">
+                    <div class="promptgen-card glass-card">
+                        
+                        <!-- Multi-Provider AI Vision Hub -->
+                        <div class="pgen-api-banner glass-card" id="pgen-api-banner">
+                            <!-- Provider Tabs -->
+                            <div class="pgen-provider-tabs">
+                                <button type="button" class="provider-tab-btn active" data-provider="openai" id="tab-provider-openai">
+                                    <i class="fa-solid fa-brain"></i> OpenAI GPT-4o <span class="badge-pill">Ultra HD</span>
+                                </button>
+                                <button type="button" class="provider-tab-btn" data-provider="gemini" id="tab-provider-gemini">
+                                    <i class="fa-brands fa-google"></i> Google Gemini <span class="badge-pill">Free</span>
+                                </button>
+                                <button type="button" class="provider-tab-btn" data-provider="local" id="tab-provider-local">
+                                    <i class="fa-solid fa-microchip"></i> Built-in Offline <span class="badge-pill">100% Local</span>
+                                </button>
+                            </div>
+
+                            <!-- OpenAI Provider View -->
+                            <div class="provider-view-pane" id="pane-provider-openai">
+                                <div class="api-banner-header">
+                                    <div class="api-banner-title">
+                                        <i class="fa-solid fa-sparkles" style="color:var(--accent-emerald);"></i>
+                                        <strong>OpenAI GPT-4o Vision AI (Exact Video Match)</strong>
+                                        <span class="api-status-badge badge-warning" id="openai-status-badge">
+                                            <i class="fa-solid fa-circle-exclamation"></i> OpenAI API Key Needed
+                                        </span>
+                                    </div>
+                                    <a href="https://platform.openai.com/api-keys" target="_blank" class="btn-text-link" title="Opens OpenAI Dashboard in new tab">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Get OpenAI API Key
+                                    </a>
+                                </div>
+                                <p class="api-banner-desc">Visually analyzes every second of your video with OpenAI GPT-4o to write a 1500–2500+ character exact prompt describing the real subjects, exact background, and actions:</p>
+                                <div class="api-input-row">
+                                    <div class="input-with-eye">
+                                        <input type="password" id="pgen-openai-key" class="form-input" placeholder="Paste your OpenAI API Key (sk-... or sk-proj-...)">
+                                        <button type="button" class="btn-toggle-eye" id="btn-toggle-eye-openai" title="Show/Hide Key"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                    <button class="btn-primary btn-sm btn-openai" id="btn-save-openai-key">
+                                        <i class="fa-solid fa-bolt"></i> <span>Verify & Activate GPT-4o</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Gemini Provider View -->
+                            <div class="provider-view-pane" id="pane-provider-gemini" style="display: none;">
+                                <div class="api-banner-header">
+                                    <div class="api-banner-title">
+                                        <i class="fa-solid fa-key" style="color:var(--accent-amber);"></i>
+                                        <strong>Google Gemini 2.0 / 1.5 Flash Vision</strong>
+                                        <span class="api-status-badge badge-warning" id="gemini-status-badge">
+                                            <i class="fa-solid fa-circle-exclamation"></i> Free Key Needed
+                                        </span>
+                                    </div>
+                                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn-text-link" title="Opens Google AI Studio in new tab">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Get Free Key (Google AI Studio)
+                                    </a>
+                                </div>
+                                <p class="api-banner-desc">Analyzes sequential video frames with Google Gemini Vision API (100% Free Forever):</p>
+                                <div class="api-input-row">
+                                    <div class="input-with-eye">
+                                        <input type="password" id="pgen-gemini-key" class="form-input" placeholder="Paste your Gemini API Key (AIzaSy...)">
+                                        <button type="button" class="btn-toggle-eye" id="btn-toggle-eye-gemini" title="Show/Hide Key"><i class="fa-solid fa-eye"></i></button>
+                                    </div>
+                                    <button class="btn-primary btn-sm" id="btn-save-gemini-key">
+                                        <i class="fa-solid fa-floppy-disk"></i> <span>Verify & Activate Gemini</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Local Offline Provider View -->
+                            <div class="provider-view-pane" id="pane-provider-local" style="display: none;">
+                                <div class="api-banner-header">
+                                    <div class="api-banner-title">
+                                        <i class="fa-solid fa-shield-halved" style="color:var(--accent-cyan);"></i>
+                                        <strong>Built-in Offline Neural Vision Engine</strong>
+                                        <span class="api-status-badge badge-active">
+                                            <i class="fa-solid fa-circle-check"></i> 100% Ready & Offline
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="api-banner-desc">Runs local MobileNetV2 neural vision classification and optical color/motion analysis directly on your machine with zero external API calls.</p>
+                            </div>
+                        </div>
+
+                        <!-- STEP 1: Video Upload & Select -->
+                        <div class="pgen-section">
+                            <div class="pgen-section-header">
+                                <div class="step-badge">1</div>
+                                <div>
+                                    <h3 class="pgen-step-title">Upload Video</h3>
+                                    <p class="pgen-step-desc">Choose a video from your computer or select a downloaded video</p>
+                                </div>
+                            </div>
+
+                            <div class="pgen-upload-area" id="pgen-dropzone">
+                                <div class="pgen-upload-content" id="pgen-upload-prompt">
+                                    <div class="pgen-upload-icon">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    </div>
+                                    <h4>Drag & drop video here, or <span class="highlight-link">Browse files</span></h4>
+                                    <p>Supports MP4, MOV, MKV, WebM, AVI (Any length)</p>
+                                    <div class="pgen-upload-actions">
+                                        <label class="btn-primary" for="pgen-file-input">
+                                            <i class="fa-solid fa-file-arrow-up"></i>
+                                            <span>Upload Local Video</span>
+                                        </label>
+                                        <input type="file" id="pgen-file-input" accept="video/*" style="display:none;">
+                                    </div>
+                                </div>
+
+                                <!-- Video Loaded Preview State -->
+                                <div class="pgen-preview-container" id="pgen-preview-box" style="display: none;">
+                                    <div class="pgen-video-wrapper">
+                                        <video id="pgen-preview-video" controls playsinline></video>
+                                    </div>
+                                    <div class="pgen-video-meta">
+                                        <div class="pgen-meta-item">
+                                            <i class="fa-solid fa-file-video"></i>
+                                            <span class="meta-label">File:</span>
+                                            <strong id="pgen-meta-filename">video.mp4</strong>
+                                        </div>
+                                        <div class="pgen-meta-item">
+                                            <i class="fa-solid fa-clock"></i>
+                                            <span class="meta-label">Duration:</span>
+                                            <strong id="pgen-meta-duration">00:00</strong>
+                                        </div>
+                                        <div class="pgen-meta-item">
+                                            <i class="fa-solid fa-expand"></i>
+                                            <span class="meta-label">Resolution:</span>
+                                            <strong id="pgen-meta-resolution">1920x1080</strong>
+                                        </div>
+                                        <div class="pgen-meta-item">
+                                            <i class="fa-solid fa-crop-simple"></i>
+                                            <span class="meta-label">Aspect:</span>
+                                            <strong id="pgen-meta-aspect">16:9</strong>
+                                        </div>
+                                        <button class="btn-secondary btn-sm" id="btn-pgen-change-video">
+                                            <i class="fa-solid fa-rotate"></i> Change Video
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Or select from downloaded videos -->
+                            <div class="pgen-select-row">
+                                <span><i class="fa-solid fa-folder-open"></i> Or pick from Library:</span>
+                                <select id="pgen-library-select" class="form-select">
+                                    <option value="">-- Choose from downloaded videos --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: Duration Selector -->
+                        <div class="pgen-section">
+                            <div class="pgen-section-header">
+                                <div class="step-badge">2</div>
+                                <div>
+                                    <h3 class="pgen-step-title">Select Output Prompt Duration</h3>
+                                    <p class="pgen-step-desc">The AI will structure the narrative pacing, camera choreography, and actions for this target duration</p>
+                                </div>
+                            </div>
+
+                            <div class="duration-selector-grid">
+                                <label class="duration-card" data-duration="10s">
+                                    <input type="radio" name="pgen-duration" value="10s">
+                                    <div class="duration-card-inner">
+                                        <div class="dur-badge">10 Seconds</div>
+                                        <h4>Short Clip & Hook</h4>
+                                        <p>Fast-paced, instant impact, high-energy focal action, and crisp seamless looping.</p>
+                                    </div>
+                                </label>
+
+                                <label class="duration-card active" data-duration="15s">
+                                    <input type="radio" name="pgen-duration" value="15s" checked>
+                                    <div class="duration-card-inner">
+                                        <div class="dur-badge dur-recommended">15 Seconds (Recommended)</div>
+                                        <h4>Standard Story Scene</h4>
+                                        <p>Classic three-act flow: Establishment → Progressive dynamic motion → Cinematic resolution.</p>
+                                    </div>
+                                </label>
+
+                                <label class="duration-card" data-duration="30s">
+                                    <input type="radio" name="pgen-duration" value="30s">
+                                    <div class="duration-card-inner">
+                                        <div class="dur-badge">30 Seconds</div>
+                                        <h4>Full Cinematic Narrative</h4>
+                                        <p>Comprehensive 5-phase story sequence with world-building, micro-interactions, and climax.</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: Generate Prompt Button & Progress -->
+                        <div class="pgen-section pgen-action-section">
+                            <button class="btn-download-action btn-generate-prompt" id="btn-generate-ai-prompt" disabled>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>Generate AI Prompt</span>
+                            </button>
+
+                            <!-- Loading State & Progress -->
+                            <div class="pgen-progress-box glass-card" id="pgen-progress-box" style="display: none;">
+                                <div class="pgen-prog-header">
+                                    <div class="pgen-prog-label">
+                                        <div class="spinner-sm"></div>
+                                        <span id="pgen-status-text">Analyzing video keyframes...</span>
+                                    </div>
+                                    <span class="pgen-prog-percent" id="pgen-percent-text">25%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-fill" id="pgen-progress-fill" style="width: 25%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: Output Prompt & Copy Box -->
+                        <div class="pgen-result-section" id="pgen-result-card" style="display: none;">
+                            <div class="result-header">
+                                <div class="result-title-group">
+                                    <div class="sparkle-circle"><i class="fa-solid fa-sparkles"></i></div>
+                                    <div>
+                                        <h3 class="result-title">Generated AI Video Prompt</h3>
+                                        <p class="result-meta" id="pgen-engine-tag"><i class="fa-solid fa-shield-halved"></i> Copyright-Clean & Ready for Sora, Runway, Luma & Kling</p>
+                                    </div>
+                                </div>
+                                <div class="result-actions">
+                                    <button class="btn-copy-prompt" id="btn-copy-master-prompt">
+                                        <i class="fa-solid fa-copy"></i>
+                                        <span>Copy Prompt</span>
+                                    </button>
+                                    <button class="btn-secondary btn-sm" id="btn-download-prompt-txt" title="Download text file">
+                                        <i class="fa-solid fa-download"></i>
+                                        <span>.TXT</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Prompt Tabs -->
+                            <div class="prompt-tabs-bar">
+                                <button class="prompt-tab-btn active" data-ptab="master">
+                                    <i class="fa-solid fa-file-lines"></i> Complete Master Prompt
+                                </button>
+                                <button class="prompt-tab-btn" data-ptab="timeline">
+                                    <i class="fa-solid fa-timeline"></i> Timeline Breakdown
+                                </button>
+                                <button class="prompt-tab-btn" data-ptab="camera">
+                                    <i class="fa-solid fa-video"></i> Camera & Lighting
+                                </button>
+                                <button class="prompt-tab-btn" data-ptab="audio">
+                                    <i class="fa-solid fa-volume-high"></i> Sound & ASMR
+                                </button>
+                                <button class="prompt-tab-btn" data-ptab="tags">
+                                    <i class="fa-solid fa-tags"></i> Model Tags
+                                </button>
+                            </div>
+
+                            <!-- Tab 1: Master Prompt View -->
+                            <div class="prompt-tab-content active" id="ptab-master">
+                                <div class="prompt-output-box">
+                                    <div class="prompt-text-view" id="pgen-output-master-text"></div>
+                                </div>
+                            </div>
+
+                            <!-- Tab 2: Timeline Breakdown View -->
+                            <div class="prompt-tab-content" id="ptab-timeline">
+                                <div class="timeline-steps-container" id="pgen-output-timeline"></div>
+                            </div>
+
+                            <!-- Tab 3: Camera & Lighting View -->
+                            <div class="prompt-tab-content" id="ptab-camera">
+                                <div class="spec-card">
+                                    <h4><i class="fa-solid fa-camera"></i> Camera Choreography</h4>
+                                    <p id="pgen-output-camera"></p>
+                                    <h4 style="margin-top:16px;"><i class="fa-solid fa-palette"></i> Visual Style & Lighting</h4>
+                                    <p id="pgen-output-style"></p>
+                                </div>
+                            </div>
+
+                            <!-- Tab 4: Sound & ASMR View -->
+                            <div class="prompt-tab-content" id="ptab-audio">
+                                <div class="spec-card">
+                                    <h4><i class="fa-solid fa-headphones"></i> Sound Effects & ASMR Cues</h4>
+                                    <p id="pgen-output-sound"></p>
+                                </div>
+                            </div>
+
+                            <!-- Tab 5: Model Tags View -->
+                            <div class="prompt-tab-content" id="ptab-tags">
+                                <div class="spec-card">
+                                    <h4><i class="fa-solid fa-sliders"></i> Optimized AI Model Parameters</h4>
+                                    <p id="pgen-output-tags"></p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Bottom Actions -->
+                            <div class="result-footer">
+                                <button class="btn-primary" id="btn-copy-prompt-bottom">
+                                    <i class="fa-solid fa-copy"></i> Copy Prompt
+                                </button>
+                                <button class="btn-secondary" id="btn-regenerate-prompt">
+                                    <i class="fa-solid fa-rotate-right"></i> Regenerate
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Watermark Remover Studio -->
+            <section class="tab-panel" id="panel-watermark">
+                <div class="panel-hero">
+                    <h2 class="hero-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan); margin-right:8px;"></i> Multi-Watermark Remover & 4K AI Studio</h2>
+                    <p class="hero-desc">Remove multiple logos, handles, or subtitles simultaneously with clean Inpaint Delogo & upscale to 4K Ultra HD quality</p>
+                </div>
+
+                <div class="studio-workspace glass-card">
+                    <!-- Left: Video Canvas & Visual Bounding Boxes -->
+                    <div class="studio-canvas-col">
+                        <div class="canvas-viewport" id="canvas-viewport">
+                            <video id="studio-video" preload="auto" playsinline muted style="display: none;"></video>
+                            <canvas id="studio-canvas" style="display: none;"></canvas>
+                            
+                            <!-- Multi-box container overlay -->
+                            <div class="watermark-boxes-container" id="watermark-boxes-container">
+                                <!-- Dynamic bounding boxes inserted here -->
+                            </div>
+
+                            <!-- Big Play/Pause Overlay Button -->
+                            <div class="studio-play-overlay" id="studio-play-overlay" style="display: none;">
+                                <i class="fa-solid fa-play"></i>
+                            </div>
+
+                            <div class="canvas-empty-overlay" id="studio-empty-prompt">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <h3>Load Video to Remove Watermarks</h3>
+                                <p>Choose any video from your PC or select from your downloads</p>
+                                <div class="canvas-prompt-buttons">
+                                    <label class="btn-primary btn-upload-hero" for="file-upload-input" style="cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                                        <i class="fa-solid fa-file-arrow-up"></i>
+                                        <span>Upload Video from PC</span>
+                                    </label>
+                                    <input type="file" id="file-upload-input" style="display: none;" accept="video/*,.mp4,.mov,.mkv,.webm,.avi">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Video playback controls -->
+                        <div class="studio-video-controls" id="studio-controls" style="display: none;">
+                            <button class="btn-icon" id="btn-studio-play"><i class="fa-solid fa-play"></i></button>
+                            <input type="range" id="studio-seekbar" min="0" max="100" value="0" step="0.1">
+                            <span class="time-display" id="studio-time">00:00 / 00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Control Panel, Multi-Zone Manager & 4K Enhancer -->
+                    <div class="studio-controls-col">
+                        <!-- Source video selection dropdown -->
+                        <div class="control-group">
+                            <label class="control-label"><i class="fa-solid fa-video"></i> Select Video Source:</label>
+                            <div class="source-select-row">
+                                <select id="studio-video-select" class="form-select">
+                                    <option value="">-- Choose from downloaded videos --</option>
+                                </select>
+                                <button class="btn-secondary btn-icon-only" type="button" id="btn-upload-trigger-2" title="Upload Local Video">
+                                    <i class="fa-solid fa-upload"></i>
+                                </button>
+                                <input type="file" id="file-upload-input-2" style="display: none;" accept="video/*,.mp4,.mov,.mkv,.webm,.avi">
+                            </div>
+                        </div>
+
+                        <!-- Three Fixed Removal Zones + Manual Mode Selector -->
+                        <div class="control-group zone-selection-panel">
+                            <div class="section-toolbar-header">
+                                <label class="control-label"><i class="fa-solid fa-layer-group"></i> 1. Select Removal Zones (Top / Side / Bottom):</label>
+                                <span class="zone-counter-badge" id="wm-zone-counter">0 Active Zones</span>
+                            </div>
+
+                            <!-- 3 Fixed Removal Zone Toggle Cards -->
+                            <div class="fixed-zones-selector-grid">
+                                <label class="zone-toggle-card" id="card-zone-top" data-zone="top">
+                                    <input type="checkbox" id="chk-zone-top" class="zone-checkbox">
+                                    <div class="zone-card-body">
+                                        <div class="zone-card-icon"><i class="fa-solid fa-arrow-up-to-line"></i></div>
+                                        <div class="zone-card-info">
+                                            <span class="zone-card-title">Top Zone</span>
+                                            <span class="zone-card-sub">Top-Right / Top-Left</span>
+                                        </div>
+                                        <span class="zone-check-indicator"><i class="fa-solid fa-check"></i></span>
+                                    </div>
+                                </label>
+
+                                <label class="zone-toggle-card" id="card-zone-side" data-zone="side">
+                                    <input type="checkbox" id="chk-zone-side" class="zone-checkbox">
+                                    <div class="zone-card-body">
+                                        <div class="zone-card-icon"><i class="fa-solid fa-arrows-left-right-to-line"></i></div>
+                                        <div class="zone-card-info">
+                                            <span class="zone-card-title">Side / Middle</span>
+                                            <span class="zone-card-sub">Center & Side Logos</span>
+                                        </div>
+                                        <span class="zone-check-indicator"><i class="fa-solid fa-check"></i></span>
+                                    </div>
+                                </label>
+
+                                <label class="zone-toggle-card" id="card-zone-bottom" data-zone="bottom">
+                                    <input type="checkbox" id="chk-zone-bottom" class="zone-checkbox">
+                                    <div class="zone-card-body">
+                                        <div class="zone-card-icon"><i class="fa-solid fa-arrow-down-to-line"></i></div>
+                                        <div class="zone-card-info">
+                                            <span class="zone-card-title">Bottom Zone</span>
+                                            <span class="zone-card-sub">Bottom-Right / Subtitles</span>
+                                        </div>
+                                        <span class="zone-check-indicator"><i class="fa-solid fa-check"></i></span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Manual Selection Mode & Action Toolbar -->
+                            <div class="manual-mode-actions-row">
+                                <button type="button" class="btn-manual-draw" id="btn-toggle-manual-mode" title="Click and drag on video to draw custom watermark box">
+                                    <i class="fa-solid fa-pen-ruler"></i>
+                                    <span>✏️ Manual Selection Mode</span>
+                                </button>
+                                <button type="button" class="btn-secondary btn-sm" id="btn-add-wm-zone" title="Add Custom Box">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>+ Add Box</span>
+                                </button>
+                                <button type="button" class="btn-secondary btn-sm btn-danger-hover" id="btn-clear-all-zones" title="Clear all zones">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Dynamic Active Zones List -->
+                            <div class="wm-zones-list" id="wm-zones-list">
+                                <div class="empty-zones-note" id="empty-zones-note">
+                                    <i class="fa-solid fa-crosshairs"></i> Select <strong>Top</strong>, <strong>Side</strong>, or <strong>Bottom</strong> zone above, or click <strong>✏️ Manual Selection Mode</strong> to draw.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Universal Video Presets -->
+                        <div class="control-group">
+                            <label class="control-label"><i class="fa-solid fa-bolt"></i> Universal 1-Click Presets:</label>
+                            <div class="preset-buttons-grid">
+                                <button class="btn-preset btn-preset-dola" data-preset="dola-ai" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(236,72,153,0.3), rgba(168,85,247,0.3), rgba(6,182,212,0.3)); border-color: var(--accent-cyan); font-weight:700;">
+                                    <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-cyan);"></i> ✨ Dola AI (All 3 Jumping Logos: Center + Top + Bottom)
+                                </button>
+                                <button class="btn-preset" data-preset="all-3-zones">
+                                    <i class="fa-solid fa-layer-group"></i> All 3 Zones (Top + Side + Bottom)
+                                </button>
+                                <button class="btn-preset" data-preset="tiktok-both">
+                                    <i class="fa-brands fa-tiktok"></i> TikTok (Top + Bottom)
+                                </button>
+                                <button class="btn-preset" data-preset="center">
+                                    <i class="fa-solid fa-bullseye"></i> Center / Side Logo
+                                </button>
+                                <button class="btn-preset" data-preset="top-only">
+                                    <i class="fa-solid fa-arrow-up-to-line"></i> Top Only
+                                </button>
+                                <button class="btn-preset" data-preset="bottom-only">
+                                    <i class="fa-solid fa-arrow-down-to-line"></i> Bottom Only
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 4K Video Quality Enhancement Options -->
+                        <div class="control-group">
+                            <label class="control-label"><i class="fa-solid fa-sparkles" style="color:var(--accent-amber);"></i> Video Quality & Enhancement:</label>
+                            <div class="enhancement-cards-grid">
+                                <label class="enhance-card active" data-enhance="none">
+                                    <input type="radio" name="wm-enhance" value="none" checked>
+                                    <div class="enhance-card-content">
+                                        <div class="enh-head">
+                                            <i class="fa-solid fa-bolt"></i>
+                                            <strong>Original Quality</strong>
+                                        </div>
+                                        <span>Fast rendering at source resolution</span>
+                                    </div>
+                                </label>
+
+                                <label class="enhance-card" data-enhance="hd_sharpen">
+                                    <input type="radio" name="wm-enhance" value="hd_sharpen">
+                                    <div class="enhance-card-content">
+                                        <div class="enh-head">
+                                            <i class="fa-solid fa-wand-sparkles"></i>
+                                            <strong>HD Detail Sharpness</strong>
+                                        </div>
+                                        <span>Edge refinement & clean contrast boost</span>
+                                    </div>
+                                </label>
+
+                                <label class="enhance-card" data-enhance="4k_upscale">
+                                    <input type="radio" name="wm-enhance" value="4k_upscale">
+                                    <div class="enhance-card-content">
+                                        <div class="enh-head">
+                                            <i class="fa-solid fa-gem" style="color:var(--accent-cyan);"></i>
+                                            <strong>4K Ultra HD AI Upscale</strong>
+                                            <span class="badge-pro-pill">PRO</span>
+                                        </div>
+                                        <span>3840×2160 Lanczos super-res + sharpness</span>
+                                    </div>
+                                </label>
+
+                                <label class="enhance-card" data-enhance="4k_hdr">
+                                    <input type="radio" name="wm-enhance" value="4k_hdr">
+                                    <div class="enhance-card-content">
+                                        <div class="enh-head">
+                                            <i class="fa-solid fa-film" style="color:var(--accent-amber);"></i>
+                                            <strong>4K HDR Cinematic Pro</strong>
+                                        </div>
+                                        <span>4K Upscale + Dynamic Color Vibrancy EQ</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Active Selected Box Coordinate Inspector -->
+                        <div class="control-group" id="active-box-coords-group">
+                            <label class="control-label"><i class="fa-solid fa-ruler-combined"></i> Active Zone Coordinates (Pixels):</label>
+                            <div class="coord-inputs-grid">
+                                <div class="coord-field">
+                                    <span>X:</span>
+                                    <input type="number" id="coord-x" value="0">
+                                </div>
+                                <div class="coord-field">
+                                    <span>Y:</span>
+                                    <input type="number" id="coord-y" value="0">
+                                </div>
+                                <div class="coord-field">
+                                    <span>W:</span>
+                                    <input type="number" id="coord-w" value="140">
+                                </div>
+                                <div class="coord-field">
+                                    <span>H:</span>
+                                    <input type="number" id="coord-h" value="80">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Process CTA -->
+                        <button class="btn-download-action btn-process-wm" id="btn-process-watermark">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Remove All Watermarks & Export Video</span>
+                        </button>
+
+                        <!-- Watermark Job Status Card -->
+                        <div class="wm-progress-card glass-card" id="wm-progress-card" style="display: none;">
+                            <div class="wm-prog-header">
+                                <div class="wm-prog-status-group">
+                                    <div class="spinner-sm" id="wm-spinner"></div>
+                                    <span class="wm-prog-status" id="wm-prog-status-text">Processing Video...</span>
+                                </div>
+                                <span class="wm-prog-percent" id="wm-prog-percent-text">0%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="wm-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <div class="wm-prog-actions" id="wm-completed-actions" style="display: none;">
+                                <button class="btn-primary" id="btn-view-clean-video">
+                                    <i class="fa-solid fa-circle-play"></i> Watch Clean Video
+                                </button>
+                                <button class="btn-secondary" id="btn-download-clean-direct">
+                                    <i class="fa-solid fa-download"></i> Download to Device
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Batch Downloader -->
+            <section class="tab-panel" id="panel-batch">
+                <div class="panel-hero">
+                    <h2 class="hero-title">Batch Video Downloader</h2>
+                    <p class="hero-desc">Paste multiple URLs to download entire playlists, TikTok profiles, or Instagram reels simultaneously</p>
+                </div>
+
+                <div class="batch-container glass-card">
+                    <div class="batch-input-area">
+                        <label class="control-label"><i class="fa-solid fa-list-ol"></i> Enter URLs (One link per line):</label>
+                        <textarea id="batch-urls-input" class="form-textarea" placeholder="https://www.tiktok.com/@user/video/1&#10;https://www.instagram.com/reel/abc&#10;https://www.youtube.com/watch?v=xyz" rows="8"></textarea>
+                    </div>
+
+                    <div class="batch-options-row">
+                        <div class="batch-option-item">
+                            <label><i class="fa-solid fa-sparkles"></i> Auto-Remove Watermark:</label>
+                            <input type="checkbox" id="batch-toggle-nowm" checked>
+                        </div>
+                        <div class="batch-option-item">
+                            <label><i class="fa-solid fa-film"></i> Format:</label>
+                            <select id="batch-format-select" class="form-select">
+                                <option value="best_video">Best Video Quality (MP4)</option>
+                                <option value="best_audio">Extract MP3 Audio (320kbps)</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary btn-batch-start" id="btn-start-batch">
+                            <i class="fa-solid fa-play"></i> Start Batch Download
+                        </button>
+                    </div>
+                </div>
+
+                <div class="batch-results-section" id="batch-results-container" style="display: none;">
+                    <h3><i class="fa-solid fa-list-check"></i> Batch Queue Progress</h3>
+                    <div class="jobs-list" id="batch-jobs-list"></div>
+                </div>
+            </section>
+
+            <!-- TAB 4: Media Library -->
+            <section class="tab-panel" id="panel-library">
+                <div class="library-header">
+                    <div>
+                        <h2 class="hero-title">My Private Downloads & Library</h2>
+                        <p class="hero-desc" id="library-storage-path"><i class="fa-solid fa-lock"></i> Private to your session</p>
+                    </div>
+                    <div class="library-actions">
+                        <button class="btn-secondary" id="btn-refresh-library">
+                            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                        </button>
+                        <button class="btn-secondary" id="btn-clear-my-library" style="color:var(--accent-rose)">
+                            <i class="fa-solid fa-trash-can"></i> Clear My History
+                        </button>
+                        <button class="btn-primary" id="btn-open-library-folder">
+                            <i class="fa-solid fa-folder-open"></i> Open Folder
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Library Items Grid -->
+                <div class="library-grid" id="library-grid-container">
+                    <!-- Media item cards dynamically populated -->
+                </div>
+
+                <!-- Empty Library State -->
+                <div class="empty-library-state glass-card" id="empty-library-placeholder" style="display: none;">
+                    <i class="fa-solid fa-box-open"></i>
+                    <h3>No Downloaded Files Found</h3>
+                    <p>Videos and audios you download or edit will appear here.</p>
+                </div>
+            </section>
+
+            <!-- TAB 5: Settings -->
+            <section class="tab-panel" id="panel-settings">
+                <div class="panel-hero">
+                    <h2 class="hero-title">Application Settings</h2>
+                    <p class="hero-desc">Configure download directories, quality preferences, and engine options</p>
+                </div>
+
+                <div class="settings-card glass-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Download Directory</h4>
+                            <p>Folder where videos and MP3 files are saved on your computer</p>
+                        </div>
+                        <div class="setting-control setting-path-row">
+                            <input type="text" id="setting-download-dir" class="form-input" readonly>
+                            <button class="btn-secondary" id="btn-setting-open-dir"><i class="fa-solid fa-folder-tree"></i> Open</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Auto Remove Watermark (TikTok / Reels)</h4>
+                            <p>Automatically prioritize watermark-free CDN streams whenever available</p>
+                        </div>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="setting-auto-nowm" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Default MP3 Audio Bitrate</h4>
+                            <p>Bitrate used when extracting and converting audio files</p>
+                        </div>
+                        <div class="setting-control">
+                            <select id="setting-audio-bitrate" class="form-select">
+                                <option value="320">320 kbps (Studio Master)</option>
+                                <option value="256">256 kbps (High Quality)</option>
+                                <option value="192">192 kbps (Standard)</option>
+                                <option value="128">128 kbps (Compact)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>OpenAI API Key (Recommended for GPT-4o Vision)</h4>
+                            <p>Powers ultra-realistic 1500–2500+ character AI Video Prompts matching the exact real video.</p>
+                        </div>
+                        <div class="setting-control setting-path-row">
+                            <input type="password" id="setting-openai-api-key" class="form-input" placeholder="sk-... / sk-proj-...">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Google Gemini API Key (Optional)</h4>
+                            <p>Enable Google Gemini 2.0 / 1.5 Flash Vision for AI Video-to-Prompt Generation.</p>
+                        </div>
+                        <div class="setting-control setting-path-row">
+                            <input type="password" id="setting-gemini-api-key" class="form-input" placeholder="AIzaSy... (Optional)">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>FFmpeg Engine Status</h4>
+                            <p>Bundled hardware-accelerated multimedia encoder and watermark delogo processor</p>
+                        </div>
+                        <div class="setting-control">
+                            <span class="badge-success" id="setting-ffmpeg-status"><i class="fa-solid fa-circle-check"></i> Installed & Operational</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-save-row">
+                        <button class="btn-primary" id="btn-save-settings">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Preferences
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Video Player Modal -->
+        <div class="modal-overlay" id="player-modal" style="display: none;">
+            <div class="modal-card glass-card">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-video-title">Video Player</h3>
+                    <button class="btn-icon btn-close-modal" id="btn-close-player"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <video id="modal-video-element" controls autoplay playsinline></video>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="modal-open-wm-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Watermark Studio</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification Container -->
+        <div class="toast-container" id="toast-container"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js?v=15.0"></script>
+</body>
+</html>
