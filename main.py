@@ -48,10 +48,12 @@ if __name__ == "__main__":
     if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
         sys.stderr.reconfigure(encoding='utf-8')
 
-    # Read host and port from environment (Railway injects $PORT)
+    # Read host and port from environment (Railway/Render/Hugging Face injects $PORT)
     env_port = os.getenv("PORT")
     if env_port and env_port.isdigit():
         target_port = int(env_port)
+    elif os.getenv("SPACE_ID"):
+        target_port = 7860
     elif IS_CLOUD_DEPLOY:
         target_port = 8000
     else:

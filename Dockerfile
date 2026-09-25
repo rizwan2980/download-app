@@ -33,8 +33,8 @@ COPY main.py .
 # Create downloads storage directory
 RUN mkdir -p /app/downloads && chmod 777 /app/downloads
 
-# Expose default port (Railway will map dynamic PORT)
-EXPOSE 8000
+# Expose default port (Render/Railway map dynamic PORT, Hugging Face uses 7860)
+EXPOSE 8000 7860
 
 # Healthcheck definition for container runtimes
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
