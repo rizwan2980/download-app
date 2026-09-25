@@ -1,5 +1,7 @@
 # 🚀 OmniDownloader PRO - All-in-One Social Media Downloader & Watermark Remover (Python)
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/rizwan2980/download-app)
+
 An advanced, high-performance Python application designed to download videos and audio from all major social media platforms with built-in **Watermark Removal** and an interactive **Watermark Removal Studio**.
 
 ---
